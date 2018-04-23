@@ -15,16 +15,17 @@ def scanline_convert(polygons, i, screen, zbuffer ):
     else:
         mb = (points[1][0]-points[0][0])/(points[1][1]-points[0][1])
     if points[2][1] == points[1][1]:
-        tm = 0
+        mt = 0
     else:
-        tm = (points[2][0]-points[1][0])/(points[2][1]-points[1][1])
+        mt = (points[2][0]-points[1][0])/(points[2][1]-points[1][1])
     tb = (points[2][0]-points[0][0])/(points[2][1]-points[0][1]) 
-    print [tb,tm,mb]
     index = points[0][1]
+    print [mt, mb]
     while index < points[2][1]:
         if index > points[1][1]:
-            inc = tm
+            inc = mt
             start = index-points[1][1]
+            start *= -1
         else:
             inc = mb
             start = index-points[0][1]
