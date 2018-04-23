@@ -2,9 +2,49 @@ from display import *
 from matrix import *
 from math import *
 from gmath import *
+import random
 
 def scanline_convert(polygons, i, screen, zbuffer ):
-    pass
+    r = random.randint(0,255)
+    g = random.randint(0,255)
+    b = random.randint(0,255)
+    p = polygons[i:i+3]
+    points = get_order(p)
+    if points[1][1] == points[0][1]:
+        mb = 0
+    else:
+        mb = (points[1][0]-points[0][0])/(points[1][1]-points[0][1])
+    if points[2][1] == points[1][1]:
+        tm = 0
+    else:
+        tm = (points[2][0]-points[1][0])/(points[2][1]-points[1][1])
+    tb = (points[2][0]-points[0][0])/(points[2][1]-points[0][1]) 
+    print [tb,tm,mb]
+    index = points[0][1]
+    while index < points[2][1]:
+        if index > points[1][1]:
+            inc = tm
+            start = index-points[1][1]
+        else:
+            inc = mb
+            start = index-points[0][1]
+        draw_line(int(points[0][0]+tb*(index-points[0][1])),int(index),int(points[0][2]),
+                  int(points[0][0]+inc*start),int(index),int(points[0][2]),
+                  screen,[],[r,g,b])
+        index += 1
+        
+def get_order(p):
+    ycors = [p[0][1],p[1][1],p[2][1]]
+    ycors = sorted(ycors)
+    ans = [0,ycors[1],0]
+    i = 0
+    while i < len(p):
+        x = ycors.index(p[i][1])
+        ans[x] = p[i]
+        if ycors.count(p[i][1]) > 1:
+            ycors[x] = ''
+        i += 1
+    return ans
 
 def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
     add_point(polygons, x0, y0, z0);
@@ -43,6 +83,7 @@ def draw_polygons( matrix, screen, zbuffer, color ):
                        int(matrix[point+2][1]),
                        matrix[point+2][2],
                        screen, zbuffer, color)
+            scanline_convert(matrix,point,screen,[])
         point+= 3
 
 
