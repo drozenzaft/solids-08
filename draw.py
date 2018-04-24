@@ -5,34 +5,49 @@ from gmath import *
 import random
 
 def scanline_convert(polygons, i, screen, zbuffer ):
-    r = random.randint(0,255)
-    g = random.randint(0,255)
-    b = random.randint(0,255)
+    r = random.randint(0,150)
+    g = random.randint(0,150)
+    b = random.randint(0,150)
     p = polygons[i:i+3]
     points = get_order(p)
     if points[1][1] == points[0][1]:
         mb = 0
+        mbz = 0
     else:
         mb = (points[1][0]-points[0][0])/(points[1][1]-points[0][1])
+        mbz = (points[1][2]-points[0][2])/(points[1][1]-points[0][1])
+
     if points[2][1] == points[1][1]:
         mt = 0
+        mtz = 0
     else:
         mt = (points[2][0]-points[1][0])/(points[2][1]-points[1][1])
-    tb = (points[2][0]-points[0][0])/(points[2][1]-points[0][1]) 
-    index = points[0][1]+1
+        mtz = (points[2][2]-points[1][2])/(points[2][1]-points[1][1])
+    tb = (points[2][0]-points[0][0])/(points[2][1]-points[0][1])
+    tbz = (points[2][2]-points[0][2])/(points[2][1]-points[0][1])
+    index = points[0][1]
+    indez = points[0][2]
     while index < points[2][1]:
         add = 0
         if index > points[1][1]:
             add = (points[1][0]-points[0][0])
+            addz = (points[1][2]-points[0][2])
             inc = mt
+            incz = mtz
             start = index-points[1][1]
+            startz = indez-points[1][2]
         else:
             inc = mb
+            incz = mbz
             start = index-points[0][1]
-        draw_line(int(points[0][0]+tb*(index-points[0][1])),int(index),int(points[0][2]),
-                  int(points[0][0]+add+inc*start),int(index),int(points[0][2]),
+            startz = indez-points[0][2]
+        draw_line(int(points[0][0]+tb*(index-points[0][1])),
+                  int(index),points[0][2]+tbz*(indez-points[0][2]),
+                  int(points[0][0]+add+inc*start),int(index),points[0][2]+add+
+                  incz*startz,
                   screen,zbuffer,[r,g,b])
         index += 0.99999
+        indez += 0.99999
         
 def get_order(p):
     ycors = [p[0][1],p[1][1],p[2][1]]
@@ -84,7 +99,7 @@ def draw_polygons( matrix, screen, zbuffer, color ):
                        int(matrix[point+2][1]),
                        matrix[point+2][2],
                        screen, zbuffer, color)
-            scanline_convert(matrix,point,screen,[])
+            scanline_convert(matrix,point,screen,zbuffer)
         point+= 3
 
 
@@ -299,10 +314,12 @@ def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ):
 
     x = x0
     y = y0
+    z = z0
     A = 2 * (y1 - y0)
     B = -2 * (x1 - x0)
     wide = False
     tall = False
+
 
     if ( abs(x1-x0) >= abs(y1 - y0) ): #octants 1/8
         wide = True
@@ -340,7 +357,8 @@ def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ):
             loop_end = y
 
     while ( loop_start < loop_end ):
-        plot( screen, zbuffer, color, x, y, 0 )
+        z += (loop_end-loop_start)*(z1-z0)
+        plot( screen, zbuffer, color, x, y, z )
         if ( (wide and ((A > 0 and d > 0) or (A < 0 and d < 0))) or
              (tall and ((A > 0 and d < 0) or (A < 0 and d > 0 )))):
 
@@ -352,4 +370,5 @@ def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ):
             y+= dy_east
             d+= d_east
         loop_start+= 1
-    plot( screen, zbuffer, color, x, y, 0 )
+    z = z1
+    plot( screen, zbuffer, color, x, y, z )
