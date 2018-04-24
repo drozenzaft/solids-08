@@ -19,20 +19,20 @@ def scanline_convert(polygons, i, screen, zbuffer ):
     else:
         mt = (points[2][0]-points[1][0])/(points[2][1]-points[1][1])
     tb = (points[2][0]-points[0][0])/(points[2][1]-points[0][1]) 
-    index = points[0][1]
-    print [mt, mb]
+    index = points[0][1]+1
     while index < points[2][1]:
+        add = 0
         if index > points[1][1]:
+            add = (points[1][0]-points[0][0])
             inc = mt
             start = index-points[1][1]
-            start *= -1
         else:
             inc = mb
             start = index-points[0][1]
         draw_line(int(points[0][0]+tb*(index-points[0][1])),int(index),int(points[0][2]),
-                  int(points[0][0]+inc*start),int(index),int(points[0][2]),
-                  screen,[],[r,g,b])
-        index += 1
+                  int(points[0][0]+add+inc*start),int(index),int(points[0][2]),
+                  screen,zbuffer,[r,g,b])
+        index += 0.99999
         
 def get_order(p):
     ycors = [p[0][1],p[1][1],p[2][1]]
