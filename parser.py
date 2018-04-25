@@ -56,7 +56,6 @@ def parse_file( fname, edges, polygons, transform, screen, zbuffer, color ):
 
     f = open(fname)
     lines = f.readlines()
-    print zbuffer
     clear_screen(screen)
     clear_zbuffer(zbuffer)
     t = new_matrix()
@@ -64,7 +63,7 @@ def parse_file( fname, edges, polygons, transform, screen, zbuffer, color ):
     systems = [ t ]
 
     step = 100
-    step_3d = 20
+    step_3d = 10
 
     c = 0
     while c < len(lines):
